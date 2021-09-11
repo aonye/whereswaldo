@@ -1,0 +1,21 @@
+{
+  "files": {
+    "main.css": "/whereswaldo/static/css/main.52eeec4a.chunk.css",
+    "main.js": "/whereswaldo/static/js/main.9925b442.chunk.js",
+    "main.js.map": "/whereswaldo/static/js/main.9925b442.chunk.js.map",
+    "runtime-main.js": "/whereswaldo/static/js/runtime-main.6c04fd49.js",
+    "runtime-main.js.map": "/whereswaldo/static/js/runtime-main.6c04fd49.js.map",
+    "static/js/2.f12fe761.chunk.js": "/whereswaldo/static/js/2.f12fe761.chunk.js",
+    "static/js/2.f12fe761.chunk.js.map": "/whereswaldo/static/js/2.f12fe761.chunk.js.map",
+    "index.html": "/whereswaldo/index.html",
+    "static/css/main.52eeec4a.chunk.css.map": "/whereswaldo/static/css/main.52eeec4a.chunk.css.map",
+    "static/js/2.f12fe761.chunk.js.LICENSE.txt": "/whereswaldo/static/js/2.f12fe761.chunk.js.LICENSE.txt",
+    "static/media/poke_crop.40cd9071.png": "/whereswaldo/static/media/poke_crop.40cd9071.png"
+  },
+  "entrypoints": [
+    "static/js/runtime-main.6c04fd49.js",
+    "static/js/2.f12fe761.chunk.js",
+    "static/css/main.52eeec4a.chunk.css",
+    "static/js/main.9925b442.chunk.js"
+  ]
+}
