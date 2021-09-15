@@ -1,0 +1,48 @@
+{
+  "position": [
+    {
+      "title": "Blissey",
+      "xRange": [
+        510,
+        550
+      ],
+      "yRange": [
+        391,
+        421
+      ]
+    },
+    {
+      "title": "Eevee",
+      "xRange": [
+        404,
+        438
+      ],
+      "yRange": [
+        671,
+        695
+      ]
+    },
+    {
+      "title": "Chatot",
+      "xRange": [
+        156,
+        178
+      ],
+      "yRange": [
+        827,
+        852
+      ]
+    },
+    {
+      "title": "MissingNo",
+      "xRange": [
+        6,
+        8
+      ],
+      "yRange": [
+        91,
+        94
+      ]
+    }
+  ]
+}

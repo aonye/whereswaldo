@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Odibee+Sans&display=swap');
+
 /* Style reset */
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
@@ -46,8 +48,6 @@ blockquote, q {
 	quotes: "" "";
 }
 
-
-
 /* Styles start here */
 
 html,body {
@@ -69,10 +69,8 @@ area:hover{
   background-color: purple;
 }
 
-#imgCont {
+.imgCont {
   display: flex;
-  justify-content: center;
-  margin-top: 0.5vw;
   background-color: black;
 }
 
@@ -80,57 +78,26 @@ body{
   background-color: black;
 }
 
-img{
-  opacity: 1;
-  width: 99%;
+.wwImg {
+  /* width: 100%; */
+  width: 100%;
+  height: 100%;
+}
+
+.wwImg:hover{
+  cursor:crosshair;
+}
+
+area:hover{
+  cursor: crosshair;
 }
 
 #coordinates{
   color: white;
+  position: absolute;
+  background-color: purple;
 }
 
-
-nav {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    min-height: 10vh;
-    background-color:black;
-    color: #FFCB05;
-    font-size: 1.25vw;
-    box-shadow: 0 0.1vw 0.5vw rgba(243, 7, 7);
-}
-
-.navlinks {
-    height: 2vw;
-    width: 40vw;
-    display: flex;
-    justify-content: space-evenly;
-    list-style: none;
-}
-
-.navlinks li:hover {
-    font-size: 1.4vw;
-    opacity: 0.5;
-}
-
-/* NavBar Logo top left*/
-
-.logoContainer{
-    position: relative;
-}
-
-.logoContainer>* {
-    display: inline-block;
-    height: 2vw;
-}
-
-.logoImg{
-    width: 3vw;
-}
-
-.logoContainer div{
-    font-weight: 900;
-    position: absolute;
-    top: 20%;
+span {
+  background-color: white;
 }

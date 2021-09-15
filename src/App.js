@@ -1,23 +1,188 @@
-import Nav from './Nav';
-import ImageMap from 'image-map';
+import { db } from './json_to_firestore/firebase';
+import { collection, doc, setDoc, getDocs, updateDoc } from 'firebase/firestore';
+import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
+import Nav from './components/Nav';
+import Ww1 from './components/Ww1';
+import SelectionMenu from './components/SelectionMenu';
 import './index.css';
 
 function App() {
-  const img = document.querySelector('#img');
+  const [hidden, setHidden] = useState(true);
+  const [x, setX] = useState();
+  const [y, setY] = useState();
+  const imgContRef = useRef(null);
+  const mapRef = useRef(null);
+  const mainImgRef = useRef(null);
+
+  useEffect(() => {
+    //console.log('BCRCont', imgContRef.current.getBoundingClientRect(), 'BCRImg', mainImgRef.current.getBoundingClientRect());
+    // const aspectRatio = mainImgRef.current.naturalWidth / mainImgRef.current.naturalHeight;
+    // setHeight(aspectRatio, mainImgRef.current.offsetWidth);
+    setCoords(); // height does not scale different from width, no need to calc
+  });
+
+  useLayoutEffect(() => {
+    window.addEventListener('resize', setCoords);
+    setCoords();
+    return () => window.removeEventListener('resize', setCoords);
+  }, []);
+
+  // function setHeight(aspectRatio, currentWidth) { //aspect ratio is W:H
+  //   //console.log(`AR:${aspectRatio}`, `CW:${currentWidth}`);
+  //   const calcHeight = (1 / aspectRatio) * currentWidth;
+  //   mainImgRef.current.height = calcHeight;
+  // }
+
+  async function setCoords() {
+    //console.log('in async', imgCont.children, map.children, height);
+    const scaler = mainImgRef.current.offsetWidth / mainImgRef.current.naturalWidth;
+    const mapItems = Array.from(mapRef.current.children);
+    const serverArr = await fetchServerData();
+    mapItems.forEach((item) => {
+      serverArr.forEach((elem) => {
+        if (elem.obj.title === item.alt) {
+          const [x1, x2] = transformCoords(elem.obj.xRange, scaler);
+          const [y1, y2] = transformCoords(elem.obj.yRange, scaler);
+          item.coords = `${x1},${y1},${x2},${y2}`;
+        }
+      });
+    });
+
+    async function fetchServerData() {
+      let serverArr = [];
+      const querySnapshot = await getDocs(collection(db, 'position'));
+      querySnapshot.docs.forEach((doc) => {
+        serverArr = [...serverArr, { id: doc.id, obj: doc.data() }];
+      });
+      return serverArr;
+    }
+
+    function transformCoords(coordArr, percentChange) {
+      return coordArr.map((item) => {
+        return Math.floor(parseFloat(item) * percentChange);
+      });
+    }
+  }
+
   const xx = document.querySelector('#coordinates');
   function logMousePos(event) {
-    console.log(`X: ${event.clientX} Y: ${event.clientY}`);
+    // console.log(imgContRef.current.offsetLeft, imgContRef.current.getBoundingClientRect());
+    //console.log(`X: ${event.clientX} Y: ${event.clientY}`, `xxx`);
     xx.textContent = `X: ${event.pageX} Y: ${event.pageY}`;
   }
-  ImageMap('img[usemap]', 500);
-  img.addEventListener("mousemove", logMousePos);
-  //const rect = img.getBoundingClientRect();
-  //console.log(rect.top, rect.right, rect.bottom, rect.left);
+
+  async function checkCoord(listName, xCoord, yCoord) {
+    const topOffset = mainImgRef.current.offsetTop;
+    const mapItems = Array.from(mapRef.current.children);
+    const node = mapItems.find((item) => item.alt === listName);
+    const [x1, y1, x2, y2] = node.coords.split(',');
+    const [xMin, xMax] = [x1, x2].sort((a, b) => a - b);
+    const [yMin, yMax] = [y1, y2].sort((a, b) => a - b);
+    //console.log(listName, xMin, xMax, yMin, yMax, `xcoord:${xCoord}`, `ycoord${yCoord - topOffset}`);
+    if (xCoord >= xMin && xCoord <= xMax && yCoord - topOffset >= yMin && yCoord - topOffset <= yMax) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  function mapEventHand(e) {
+    console.log('clicked a map item');
+    e.preventDefault();
+    clickHandler(e);
+  }
+
+  function clickHandler(e) {
+    console.log('i clicked this', e.pageX, e.pageY);
+    setHidden(false);
+    setX(e.pageX);
+    setY(e.pageY);
+  }
+
+  async function menuClickHand(e) {
+    console.log('menuClicked');
+    //console.log(e.target);
+    const a = await checkCoord(e.target.textContent, x, y);
+    console.log(a);
+    setHidden(true);
+  }
+
+
+  // function resizeCoords() {
+  //   const aspectRatio = mainImgRef.current.naturalWidth / mainImgRef.current.naturalHeight;
+  //   setHeight(aspectRatio, mainImgRef.current.offsetWidth);
+  //   setCoords();
+  // }
+
+  // function useWindowSize() {
+  //   const [size, setSize] = useState([0, 0]);
+  //   useLayoutEffect(() => {
+  //     function updateSize() {
+  //       const aspectRatio = mainImgRef.current.naturalWidth / mainImgRef.current.naturalHeight;
+  //       setHeight(aspectRatio, mainImgRef.current.offsetWidth);
+  //       clone();
+  //     }
+  //     window.addEventListener('resize', updateSize);
+  //     updateSize();
+  //     return () => window.removeEventListener('resize', updateSize);
+  //   }, []);
+  //   return size;
+  // }
+
+  // function useWindowSize() {
+  //   const [size, setSize] = useState([0, 0]);
+  //   useLayoutEffect(() => {
+  //     function updateSize() {
+  //       setSize([window.innerWidth, window.innerHeight]);
+  //     }
+  //     window.addEventListener('resize', updateSize);
+  //     updateSize();
+  //     return () => window.removeEventListener('resize', updateSize);
+  //   }, []);
+  //   return size;
+  // }
+
+  // function ShowWindowDimensions(props) {
+  //   
+  //   return ;
+  // }
+
   return (
     <div className="App">
       <Nav />
+      <Ww1
+        imgContRef={imgContRef}
+        mainImgRef={mainImgRef}
+        mapRef={mapRef}
+        clickHandler={clickHandler}
+        mapEventHand={mapEventHand}
+      />
+      {hidden === false ? <SelectionMenu x={x} y={y} menuClickHand={menuClickHand} /> : null}
     </div>
   );
-}
+};
 
 export default App;
+
+// async function updateServer(serverArr) {
+//   serverArr.forEach((item) => {
+//     const ref = doc(db, 'position', `${item.id}`);
+//     updateDoc(ref, item.obj);
+//   });
+//   const arr = item.coords.split(',');
+//   let [x1, y1, x2, y2] = arr;
+//   [x1, x2] = transformCoords([x1, x2], scaler);
+//   [y1, y2] = transformCoords([y1, y2], scaler);
+//   item.coords = `${x1},${y1},${x2},${y2}`;
+//   updateServer(serverArr);
+// };
+
+/* Part of checkFunction at MenuClick */
+// console.log('async dataGetter', listName, xCoord, yCoord);
+// const querySnapshot = await getDocs(collection(db, 'position'));
+// const serverEntry = querySnapshot.docs.find((doc) => doc.data().title === listName);
+// const { title, xRange, yRange } = serverEntry.data();
+
+
+
+

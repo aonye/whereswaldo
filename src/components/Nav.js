@@ -1,4 +1,5 @@
-import PokeLogo from './images/poke_crop.png';
+import PokeLogo from '../images/poke_crop.png';
+import '../styles/Nav.css';
 
 const Nav = () => {
     return (
