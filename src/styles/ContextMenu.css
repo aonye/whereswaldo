@@ -1,7 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Odibee+Sans&display=swap');
 
 .contextMenu {
-    background-color: rgba(169, 169, 169, 0.212);
     font-family: 'Odibee Sans', cursive;
     position: absolute;
     display: flex;
@@ -9,11 +8,11 @@
     justify-content: flex-end;
     align-items: center;
     height: 20vw;
-    width: 20vw;
+    width: 22vw;
     top: 50%;
     left: 50%;
     margin-top: -10vw;
-    margin-left: -10vw;
+    margin-left: -11vw;
 }
 
 .contextMenu div{
@@ -54,7 +53,7 @@ button:hover{
 }
 
 button:disabled{
-    opacity: 0.25;
+    opacity: 0.15;
 }
 
 button:disabled:hover{
