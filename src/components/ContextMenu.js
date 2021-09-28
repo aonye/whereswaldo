@@ -34,7 +34,7 @@ const ContextMenu = (props) => {
 
     return (
         <div className="contextMenu">
-            <div>Welcome trainer. Ready for a battle?</div>
+            <div>Welcome trainer. Ready to find pokemon?</div>
             {configBtns()}
         </div >
     );

@@ -16,7 +16,7 @@ const App = () => {
   const [slowestLB, setSlowestLB] = useState();
   const [gameInfo, setGameInfo] = useState({
     currentMap: null,
-    clearedMaps: ['1', '2'],
+    clearedMaps: [],
     currentScore: 0,
     cumulativeTime: 0,
   });
