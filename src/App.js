@@ -1,188 +1,144 @@
-import { db } from './json_to_firestore/firebase';
-import { collection, doc, setDoc, getDocs, updateDoc } from 'firebase/firestore';
-import React, { useState, useEffect, useRef, useLayoutEffect } from 'react';
+import React, { useEffect, useState } from 'react';
+import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom';
+import { db } from './firebase/firebase.js';
+import { collection, getDocs, setDoc, doc } from 'firebase/firestore';
 import Nav from './components/Nav';
-import Ww1 from './components/Ww1';
-import SelectionMenu from './components/SelectionMenu';
+import Main from './Main';
+import Home from './components/Home';
+import Hiscores from './components/Hiscores';
 import './index.css';
 
-function App() {
-  const [hidden, setHidden] = useState(true);
-  const [x, setX] = useState();
-  const [y, setY] = useState();
-  const imgContRef = useRef(null);
-  const mapRef = useRef(null);
-  const mainImgRef = useRef(null);
-
-  useEffect(() => {
-    //console.log('BCRCont', imgContRef.current.getBoundingClientRect(), 'BCRImg', mainImgRef.current.getBoundingClientRect());
-    // const aspectRatio = mainImgRef.current.naturalWidth / mainImgRef.current.naturalHeight;
-    // setHeight(aspectRatio, mainImgRef.current.offsetWidth);
-    setCoords(); // height does not scale different from width, no need to calc
+const App = () => {
+  const [time, setTime] = useState(0);
+  const [hideTimer, setHideTimer] = useState(true);
+  const [timerOn, setTimerOn] = useState(true);
+  const [hiscores, setHiscores] = useState();
+  const [slowestLB, setSlowestLB] = useState();
+  const [gameInfo, setGameInfo] = useState({
+    currentMap: null,
+    clearedMaps: ['1', '2'],
+    currentScore: 0,
+    cumulativeTime: 0,
   });
 
-  useLayoutEffect(() => {
-    window.addEventListener('resize', setCoords);
-    setCoords();
-    return () => window.removeEventListener('resize', setCoords);
+  useEffect(() => {
+    getScores().then(val => {
+      const arr = sortScores(val);
+      const [slowest] = arr.slice(-1);
+      setHiscores(arr);
+      setSlowestLB(() => {
+        return slowest.data.time;
+      });
+    }, reason => {
+      console.log('rejected: ', reason);
+    });
   }, []);
 
-  // function setHeight(aspectRatio, currentWidth) { //aspect ratio is W:H
-  //   //console.log(`AR:${aspectRatio}`, `CW:${currentWidth}`);
-  //   const calcHeight = (1 / aspectRatio) * currentWidth;
-  //   mainImgRef.current.height = calcHeight;
-  // }
-
-  async function setCoords() {
-    //console.log('in async', imgCont.children, map.children, height);
-    const scaler = mainImgRef.current.offsetWidth / mainImgRef.current.naturalWidth;
-    const mapItems = Array.from(mapRef.current.children);
-    const serverArr = await fetchServerData();
-    mapItems.forEach((item) => {
-      serverArr.forEach((elem) => {
-        if (elem.obj.title === item.alt) {
-          const [x1, x2] = transformCoords(elem.obj.xRange, scaler);
-          const [y1, y2] = transformCoords(elem.obj.yRange, scaler);
-          item.coords = `${x1},${y1},${x2},${y2}`;
-        }
-      });
+  async function getScores() { //sorted
+    let arr = [];
+    const querySnapshot = await getDocs(collection(db, 'hiscores'));
+    querySnapshot.forEach((doc) => {
+      arr = [...arr, { id: doc.id, data: doc.data() }];
     });
-
-    async function fetchServerData() {
-      let serverArr = [];
-      const querySnapshot = await getDocs(collection(db, 'position'));
-      querySnapshot.docs.forEach((doc) => {
-        serverArr = [...serverArr, { id: doc.id, obj: doc.data() }];
-      });
-      return serverArr;
-    }
-
-    function transformCoords(coordArr, percentChange) {
-      return coordArr.map((item) => {
-        return Math.floor(parseFloat(item) * percentChange);
-      });
-    }
+    return arr;
   }
 
-  const xx = document.querySelector('#coordinates');
-  function logMousePos(event) {
-    // console.log(imgContRef.current.offsetLeft, imgContRef.current.getBoundingClientRect());
-    //console.log(`X: ${event.clientX} Y: ${event.clientY}`, `xxx`);
-    xx.textContent = `X: ${event.pageX} Y: ${event.pageY}`;
+  function sortScores(arr) {
+    return arr.sort((a, b) => {
+      return parseFloat(a.data.time) - parseFloat(b.data.time);
+    });
   }
 
-  async function checkCoord(listName, xCoord, yCoord) {
-    const topOffset = mainImgRef.current.offsetTop;
-    const mapItems = Array.from(mapRef.current.children);
-    const node = mapItems.find((item) => item.alt === listName);
-    const [x1, y1, x2, y2] = node.coords.split(',');
-    const [xMin, xMax] = [x1, x2].sort((a, b) => a - b);
-    const [yMin, yMax] = [y1, y2].sort((a, b) => a - b);
-    //console.log(listName, xMin, xMax, yMin, yMax, `xcoord:${xCoord}`, `ycoord${yCoord - topOffset}`);
-    if (xCoord >= xMin && xCoord <= xMax && yCoord - topOffset >= yMin && yCoord - topOffset <= yMax) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  function mapEventHand(e) {
-    console.log('clicked a map item');
+  async function onFormSubmit(e) {
     e.preventDefault();
-    clickHandler(e);
+    const name = Array.from(e.target.childNodes).find((node) => node.name === 'name').value;
+    const scores = await getScores();
+    const slowest = scores.find((item) => {
+      return item.data.time === slowestLB ? item : null;
+    });
+    const newScore = [...(scores.slice(0, -1)), { id: slowest.id, data: { name: name, time: gameInfo.cumulativeTime } }];
+    console.log(name, 'name', scores, 'scores', slowest, 'slowestid', newScore, 'newscore');
+    await uploadScore(newScore);
+    setHiscores(sortScores(newScore));
+    setGameInfo({ ...gameInfo, ...{ clearedMaps: [] } });
   }
 
-  function clickHandler(e) {
-    console.log('i clicked this', e.pageX, e.pageY);
-    setHidden(false);
-    setX(e.pageX);
-    setY(e.pageY);
+  async function uploadScore(scores) {
+    scores.forEach((item) => {
+      const HSRef = doc(db, 'hiscores', `${item.id}`);
+      setDoc(HSRef, item.data);
+    });
   }
 
-  async function menuClickHand(e) {
-    console.log('menuClicked');
-    //console.log(e.target);
-    const a = await checkCoord(e.target.textContent, x, y);
-    console.log(a);
-    setHidden(true);
+  const clickLvlHand = (e) => {
+    let level = e.target.textContent;
+    const levelNo = level.slice(-1);
+    setGameInfo({ ...gameInfo, currentMap: levelNo });
+  };
+
+  function resetGI() {
+    setGameInfo({
+      currentMap: null,
+      clearedMaps: [],
+      currentScore: 0,
+      cumulativeTime: 0,
+    });
   }
-
-
-  // function resizeCoords() {
-  //   const aspectRatio = mainImgRef.current.naturalWidth / mainImgRef.current.naturalHeight;
-  //   setHeight(aspectRatio, mainImgRef.current.offsetWidth);
-  //   setCoords();
-  // }
-
-  // function useWindowSize() {
-  //   const [size, setSize] = useState([0, 0]);
-  //   useLayoutEffect(() => {
-  //     function updateSize() {
-  //       const aspectRatio = mainImgRef.current.naturalWidth / mainImgRef.current.naturalHeight;
-  //       setHeight(aspectRatio, mainImgRef.current.offsetWidth);
-  //       clone();
-  //     }
-  //     window.addEventListener('resize', updateSize);
-  //     updateSize();
-  //     return () => window.removeEventListener('resize', updateSize);
-  //   }, []);
-  //   return size;
-  // }
-
-  // function useWindowSize() {
-  //   const [size, setSize] = useState([0, 0]);
-  //   useLayoutEffect(() => {
-  //     function updateSize() {
-  //       setSize([window.innerWidth, window.innerHeight]);
-  //     }
-  //     window.addEventListener('resize', updateSize);
-  //     updateSize();
-  //     return () => window.removeEventListener('resize', updateSize);
-  //   }, []);
-  //   return size;
-  // }
-
-  // function ShowWindowDimensions(props) {
-  //   
-  //   return ;
-  // }
 
   return (
-    <div className="App">
-      <Nav />
-      <Ww1
-        imgContRef={imgContRef}
-        mainImgRef={mainImgRef}
-        mapRef={mapRef}
-        clickHandler={clickHandler}
-        mapEventHand={mapEventHand}
-      />
-      {hidden === false ? <SelectionMenu x={x} y={y} menuClickHand={menuClickHand} /> : null}
-    </div>
+    <BrowserRouter>
+      <Nav time={time} hideTimer={hideTimer} setHideTimer={setHideTimer} />
+      <Switch>
+        <Route exact path='/hiscores'
+          render={() =>
+            <Hiscores
+              gameInfo={gameInfo}
+              resetGI={resetGI}
+              slowestLB={slowestLB}
+              hiscores={hiscores}
+              onFormSubmit={onFormSubmit}
+            />}
+        />
+        <Route exact path='/main'>
+          {gameInfo.currentMap === null ?
+            <Redirect to='/' /> :
+            <Main time={time} setTime={setTime} timerOn={timerOn} setTimerOn={setTimerOn} setHideTimer={setHideTimer} gameInfo={gameInfo} setGameInfo={setGameInfo} />
+          }
+        </Route>
+        <Route exact path='/'>
+          {gameInfo.clearedMaps.length === 3 ?
+            <Redirect to='/hiscores' /> :
+            <Home gameInfo={gameInfo} clickLvlHand={clickLvlHand} />
+          }
+        </Route>
+      </Switch>
+    </BrowserRouter >
   );
 };
 
 export default App;
 
-// async function updateServer(serverArr) {
-//   serverArr.forEach((item) => {
-//     const ref = doc(db, 'position', `${item.id}`);
-//     updateDoc(ref, item.obj);
+// async function setDB() {
+//   await setDoc(doc(db, "hiscores", "0"), {
+//     name: "Anonymous",
+//     time: 90000,
 //   });
-//   const arr = item.coords.split(',');
-//   let [x1, y1, x2, y2] = arr;
-//   [x1, x2] = transformCoords([x1, x2], scaler);
-//   [y1, y2] = transformCoords([y1, y2], scaler);
-//   item.coords = `${x1},${y1},${x2},${y2}`;
-//   updateServer(serverArr);
-// };
+//   await setDoc(doc(db, "hiscores", "1"), {
+//     name: "Nyancat",
+//     time: 95000,
+//   });
+//   await setDoc(doc(db, "hiscores", "2"), {
+//     name: "Spike Spiegel",
+//     time: 100000,
+//   });
+//   await setDoc(doc(db, "hiscores", "3"), {
+//     name: "Monkey D. Luffy",
+//     time: 120000,
+//   });
+//   await setDoc(doc(db, "hiscores", "4"), {
+//     name: "Naruto Uzumaki",
+//     time: 300000,
+//   });
+// }
 
-/* Part of checkFunction at MenuClick */
-// console.log('async dataGetter', listName, xCoord, yCoord);
-// const querySnapshot = await getDocs(collection(db, 'position'));
-// const serverEntry = querySnapshot.docs.find((doc) => doc.data().title === listName);
-// const { title, xRange, yRange } = serverEntry.data();
-
-
-
-
+// setDB();

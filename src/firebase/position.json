@@ -1,0 +1,103 @@
+{
+  "position": [
+    {
+      "title": "Blissey",
+      "xRange": [
+        510,
+        550
+      ],
+      "yRange": [
+        391,
+        421
+      ]
+    },
+    {
+      "title": "Eevee",
+      "xRange": [
+        404,
+        438
+      ],
+      "yRange": [
+        671,
+        695
+      ]
+    },
+    {
+      "title": "Chatot",
+      "xRange": [
+        156,
+        178
+      ],
+      "yRange": [
+        827,
+        852
+      ]
+    },
+    {
+      "title": "Swanna",
+      "xRange": [
+        465,
+        486
+      ],
+      "yRange": [
+        293,
+        337
+      ]
+    },
+    {
+      "title": "Mienshao",
+      "xRange": [
+        682,
+        705
+      ],
+      "yRange": [
+        441,
+        477
+      ]
+    },
+    {
+      "title": "Vullaby",
+      "xRange": [
+        389,
+        409
+      ],
+      "yRange": [
+        465,
+        493
+      ]
+    },
+    {
+      "title": "Pikachu",
+      "xRange": [
+        80,
+        104
+      ],
+      "yRange": [
+        961,
+        999
+      ]
+    },
+    {
+      "title": "Basculin",
+      "xRange": [
+        231,
+        261
+      ],
+      "yRange": [
+        725,
+        742
+      ]
+    },
+    {
+      "title": "Durant",
+      "xRange": [
+        211,
+        252
+      ],
+      "yRange": [
+        451,
+        479
+      ]
+    }
+  ]
+}

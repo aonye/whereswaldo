@@ -1,0 +1,39 @@
+/* The alert message box */
+
+.alertbox {
+  position: fixed;
+  display: flex;
+  padding-top: 15vw;
+  justify-content: space-evenly;
+  height: 6vw;
+  width: 20vw;
+  align-items: center;
+  margin: 0 auto;
+  left: 50%;
+  margin-left: -10vw;
+}
+
+.alertmsg {
+  display: flex;
+  position: absolute;
+  justify-content: center;
+  align-items: center;
+  height: 3vw;
+  width: 100%;
+  color: white;
+  font-size: 1.25vw;
+  border-radius: 10%;
+  text-align: center;
+}
+
+/* The close button */
+/* .closebtn {
+  margin-left: 15px;
+  color: white;
+  font-weight: bold;
+  float: right;
+  font-size: 22px;
+  line-height: 20px;
+  cursor: pointer;
+  transition: 0.3s;
+} */

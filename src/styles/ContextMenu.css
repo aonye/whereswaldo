@@ -1,0 +1,62 @@
+@import url('https://fonts.googleapis.com/css2?family=Odibee+Sans&display=swap');
+
+.contextMenu {
+    background-color: rgba(169, 169, 169, 0.212);
+    font-family: 'Odibee Sans', cursive;
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    height: 20vw;
+    width: 20vw;
+    top: 50%;
+    left: 50%;
+    margin-top: -10vw;
+    margin-left: -10vw;
+}
+
+.contextMenu div{
+    color: #FFCB05;
+    font-size: 1.75vw;
+}
+
+#lvl1{
+    background-color: #f00000;
+    font-size: 1.5vw;
+    font-family: 'Odibee Sans', cursive;
+    width: 15vw;
+    height: 5vw;
+    border: 0.2vw solid #222224;
+}
+
+#lvl2{
+    background-color: #222224;
+    color: #f0f0f0;
+    font-size: 1.5vw;
+    font-family: 'Odibee Sans', cursive;
+    width: 15vw;
+    height: 5vw;
+    border: 0.2vw solid #f0f0f0;
+}
+
+#lvl3{
+    background-color: #f0f0f0;
+    font-size: 1.5vw;
+    font-family: 'Odibee Sans', cursive;
+    width: 15vw;
+    height: 5vw;
+    border: 0.2vw solid #222224;
+}
+
+button:hover{
+    cursor: pointer;
+}
+
+button:disabled{
+    opacity: 0.25;
+}
+
+button:disabled:hover{
+    cursor: default;
+}
